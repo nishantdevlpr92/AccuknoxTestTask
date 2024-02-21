@@ -11,7 +11,19 @@ do
      sleep 2
 done
 
+until python manage.py makemigrations account
+do
+     echo "Waiting for db to be ready..."
+     sleep 2
+done
+
 until python manage.py migrate
+do
+    echo "Waiting for db to be ready..."
+    sleep 2
+done
+
+until python manage.py migrate account
 do
     echo "Waiting for db to be ready..."
     sleep 2
