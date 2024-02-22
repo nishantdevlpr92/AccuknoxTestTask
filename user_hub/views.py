@@ -1,3 +1,4 @@
+from django.shortcuts import get_object_or_404
 from django_filters import rest_framework as filters
 from django.db.models import Case, F, IntegerField, Q, Value, When
 
@@ -7,9 +8,11 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.views import APIView
+from rest_framework.throttling import UserRateThrottle
 
 from account.models import User
-from user_hub.serilizers import SearchUserSerializer
+from user_hub.serilizers import SearchUserSerializer, FriendDataSerializer
 from user_hub.filters import SearchUserFilterSet
 from user_hub.models import Friends
 
@@ -34,8 +37,7 @@ class GetUserList(generics.ListAPIView):
     def list(self, request, *args, **kwargs):
         user_qs = SearchUserFilterSet(
             request.GET,
-            queryset=User.objects.exclude(id=request.user.id).order_by("-id"),
-        )
+            queryset=User.objects.exclude(id=request.user.id))
         page = self.paginate_queryset(user_qs.qs)
         if page is not None:
             serializer = self.serializer_class(page, many=True)
@@ -50,14 +52,13 @@ class MyFriendListView(generics.ListAPIView):
     serializer_class = SearchUserSerializer
     pagination_class = PageNumberPagination
     """
-            This API view is used to get the list of accepted friends for the authenticated user.
+    This API view is used to get the list of accepted friends for the authenticated user.
     """
 
     def get(self, request, *args, **kwargs):
         user_qs = User.objects.filter(
             id__in=self.get_friend_list_based_on_given_user(request.user)
         )
-        user_qs = self.get_user_queryset(request.user)
         page = self.paginate_queryset(user_qs)
         serializer = (
             self.serializer_class(page, many=True)
@@ -86,3 +87,38 @@ class MyFriendListView(generics.ListAPIView):
             )
             .values("accepted_user_ids")
         )
+
+
+class SendFriendRequestAPIView(generics.CreateAPIView):
+    serializer_class = FriendDataSerializer
+    permission_classes = [IsAuthenticated]
+    throttle_classes = [UserRateThrottle]
+    __doc__ = """
+            This API is used to send the friend request to the other user
+            param:
+                receiver: receiver user id
+    """
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        sender = self.request.user
+        serializer.validated_data["sender"] = sender
+        # Ensure that the receiver exists and is not the sender
+        receiver_id = serializer.validated_data["receiver"]
+        if receiver_id == sender.id:
+            return Response(
+                {"detail": "Cannot send friend request to yourself."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Ensure that there is no existing friend request between the sender and receiver
+        existing_request = Friends.objects.filter(
+            sender=sender, receiver_id=receiver_id
+        ).exists()
+        if existing_request:
+            return Response(
+                {"detail": "Friend request already sent."}, status=status.HTTP_400_BAD_REQUEST
+            )
+        self.perform_create(serializer)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
