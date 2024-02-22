@@ -1,0 +1,78 @@
+{
+	"info": {
+		"_postman_id": "606fae78-fc04-46ed-8196-caccacdb7f66",
+		"name": "New Collection",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "27648824"
+	},
+	"item": [
+		{
+			"name": "http://localhost/api/login/",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\":\"alok45988dev@gmail.com\",\n    \"password\":\"test@123\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost/api/login/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"path": [
+						"api",
+						"login",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "https://dd79-2409-40c4-28-5807-9504-a3ce-a5af-d5df.ngrok-free.app/api/load-item-file/",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzA1ODIyMTQyLCJpYXQiOjE3MDQ1MjYxNDIsImp0aSI6IjkwYjM3MmNhM2YxNTQxOTFiYTJmMDE1MGRlZDA4ZjYxIiwidXNlcl9pZCI6MSwiZW1haWwiOiJhbG9rNDU5ODhkZXZAZ21haWwuY29tIn0.8PeN8TjoVfbS2XJAi2ZP9OkeUMvL1b8CJzoCOY2rHIM",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "item_file",
+							"type": "file",
+							"src": "/home/developer/Downloads/Item file example (copy)(1).csv"
+						}
+					]
+				},
+				"url": {
+					"raw": "https://dd79-2409-40c4-28-5807-9504-a3ce-a5af-d5df.ngrok-free.app/api/load-item-file/",
+					"protocol": "https",
+					"host": [
+						"dd79-2409-40c4-28-5807-9504-a3ce-a5af-d5df",
+						"ngrok-free",
+						"app"
+					],
+					"path": [
+						"api",
+						"load-item-file",
+						""
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
