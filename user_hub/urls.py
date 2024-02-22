@@ -5,6 +5,7 @@ from user_hub.views import (
     MyFriendListView, 
     FriendRequestListView,
     SendFriendRequestAPIView,
+    AcceptRejectRequestAPIView,
 )
 
 urlpatterns = [
@@ -23,6 +24,11 @@ urlpatterns = [
         "send-friend-request/",
         SendFriendRequestAPIView.as_view(),
         name="send-friend-request",
+    ),
+    path(
+        "accept-reject-request/<int:friend_id>/",
+        AcceptRejectRequestAPIView.as_view(),
+        name="accept_reject_request",
     ),
 
 ]

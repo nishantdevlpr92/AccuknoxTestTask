@@ -8,13 +8,14 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.views import APIView
 from rest_framework.throttling import UserRateThrottle
+from rest_framework.mixins import UpdateModelMixin
 
 from account.models import User
 from user_hub.serilizers import SearchUserSerializer, FriendDataSerializer
 from user_hub.filters import SearchUserFilterSet
 from user_hub.models import Friends
+from user_hub.constants import REJECTED, ACCEPTED
 
 
 class GetUserList(generics.ListAPIView):
@@ -145,4 +146,43 @@ class FriendRequestListView(generics.ListAPIView):
             self.get_paginated_response(serializer.data)
             if page
             else Response(serializer.data, status=status.HTTP_200_OK)
+        )
+
+
+class AcceptRejectRequestAPIView(UpdateModelMixin, 
+                            generics.GenericAPIView
+    ):
+    serializer_class = FriendDataSerializer
+    permission_classes = [IsAuthenticated]
+    """
+    API endpoint for sending a friend request to another user.
+
+    Parameters:
+        status (str): The status of the friend request, \
+        which can be 'accepted' or 'rejected'.
+    """
+
+    def patch(self, request, *args, **kwargs):
+        request_instance = get_object_or_404(
+            Friends, pk=self.kwargs.get("friend_id")
+        )
+        # Check if the user making the request is the receiver.
+        if request_instance.receiver != request.user:
+            return Response(
+                {"Message": "You do not have the necessary permissions \
+                 to perform this action."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        request_status = request.data.get("status", None)
+        if request_status not in [ACCEPTED, REJECTED]:
+            return Response(
+                {"message": 'Invalid status. Please use "accepted" or\
+                 "rejected".'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        request_instance.status = request_status
+        request_instance.save()
+        return Response(
+            self.get_serializer(request_instance).data, 
+            status=status.HTTP_200_OK
         )
