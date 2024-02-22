@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
+    "drf_yasg",
     "account",
     "user_hub",
     "django_filters",
@@ -153,4 +154,14 @@ SIMPLE_JWT = {
     "REFRESH_TOKEN_LIFETIME": timedelta(days=15),
     "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
     "ROTATE_REFRESH_TOKENS": True
+}
+
+# Configuration for Django Rest Framework's Swagger
+SWAGGER_SETTINGS = {
+    "DEEP_LINKING": {"deepLinking": True},
+    "SECURITY_DEFINITIONS": {
+        "api_key": {"type": "apiKey", "in": "header", "name": "Authorization"}
+    },
+    "USE_SESSION_AUTH": False,
+    "JSON_EDITOR": True,
 }
