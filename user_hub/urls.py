@@ -23,7 +23,7 @@ urlpatterns = [
     path(
         "send-friend-request/",
         SendFriendRequestAPIView.as_view(),
-        name="send-friend-request",
+        name="send_friend_request",
     ),
     path(
         "accept-reject-request/<int:friend_id>/",

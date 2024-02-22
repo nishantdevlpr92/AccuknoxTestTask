@@ -107,7 +107,7 @@ class SendFriendRequestAPIView(generics.CreateAPIView):
         serializer.validated_data["sender"] = sender
         # Ensure that the receiver exists and is not the sender
         receiver_id = serializer.validated_data["receiver"]
-        if receiver_id == sender.id:
+        if receiver_id.id == sender.id:
             return Response(
                 {"detail": "Cannot send friend request to yourself."},
                 status=status.HTTP_400_BAD_REQUEST,
@@ -123,6 +123,7 @@ class SendFriendRequestAPIView(generics.CreateAPIView):
             )
         self.perform_create(serializer)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
 
 class FriendRequestListView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]

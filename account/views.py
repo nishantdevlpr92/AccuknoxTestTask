@@ -9,6 +9,7 @@ from account.serializers import UserSerializer, MyTokenObtainPairSerializer
 
 class SignUpView(APIView):
     permission_classes = (AllowAny,)
+    serializer_class = UserSerializer
 
     """
     A view class for handling user sign-up requests.
@@ -31,7 +32,7 @@ class SignUpView(APIView):
     """
 
     def post(self, request):
-        serializer = UserSerializer(data=request.data)
+        serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
