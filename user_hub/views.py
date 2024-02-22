@@ -122,3 +122,27 @@ class SendFriendRequestAPIView(generics.CreateAPIView):
             )
         self.perform_create(serializer)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+class FriendRequestListView(generics.ListAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = FriendDataSerializer
+    pagination_class = PageNumberPagination
+    """
+    API endpoint to retrieve the list of pending friend requests for the authenticated user.
+    """
+
+    def get(self, request, *args, **kwargs):
+        friends_list = Friends.objects.filter(
+            receiver=request.user, status="pending"
+        ).select_related("sender", "receiver")
+        page = self.paginate_queryset(friends_list)
+        serializer = (
+            self.serializer_class(page, many=True)
+            if page
+            else self.serializer_class(friends_list, many=True)
+        )
+        return (
+            self.get_paginated_response(serializer.data)
+            if page
+            else Response(serializer.data, status=status.HTTP_200_OK)
+        )

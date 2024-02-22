@@ -3,6 +3,7 @@ from django.urls import path
 from user_hub.views import (
     GetUserList, 
     MyFriendListView, 
+    FriendRequestListView,
     SendFriendRequestAPIView,
 )
 
@@ -12,6 +13,11 @@ urlpatterns = [
         "my-friend-list/", 
         MyFriendListView.as_view(), 
         name="my_friend_list"
+    ),
+    path(
+        "friend-request-list/", 
+        FriendRequestListView.as_view(), 
+        name="friend_request_list"
     ),
     path(
         "send-friend-request/",
